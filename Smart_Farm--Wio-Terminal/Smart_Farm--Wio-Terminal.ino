@@ -27,7 +27,7 @@ void setup() {
   pinMode(WIO_BUZZER, OUTPUT); //Set buzzer pin as OUTPUT
 
   myservo.attach(D2); //Connect servo to Grove Digital Port
-  myservo.write(0);
+  myservo.write(180);
 
   tft.begin(); //Start TFT LCD
   tft.setRotation(3); //Set TFT LCD rotation
@@ -54,8 +54,7 @@ void loop() {
   spr.fillRect(0, 0, 320, 50, TFT_DARKGREEN); //Rectangle fill with dark green
   spr.setTextColor(TFT_WHITE); //Setting text color
   spr.setTextSize(3); //Setting text size
-  //  spr.drawString("Smart Garden", 50, 15); //Drawing a text string
-  spr.drawString("Nerd Farm", 80, 15); //Drawing a text string
+  spr.drawString("Smart Farm", 80, 15); //Drawing a text string
 
   // Makey Face
   spr.fillCircle(233, 135, 65, TFT_RED );
@@ -91,27 +90,33 @@ void loop() {
   spr.drawString("%", 245, 190);
 
   // when the (Light, Temperature or Humidity) reaches (40 g or 40%), it warns us with the Motor
-  if ( ( light > 40 || ServoAction == 1 ) && ServoSenal == false ) {
+  if ( ( h < 30 || ServoAction == 1 ) && ServoSenal == false ) {
+    Serial.println("IF 1, < 30, a 0 grados ");
     myservo.write(StatusServo);
-    StatusServo += 20;
+    StatusServo -= 20;
     ServoAction = 1;
 
-    if (StatusServo >= 180) {
+    if (StatusServo <= 0) {
       ServoSenal = true;
       ServoAction = 0;
     }
+
   }
 
   // when the (Light, Temperature or Humidity) falls below (40 g or 40%), the motor returns to its original position
-  if ( ( light < 30 || ServoAction == 2 )  && ServoSenal == true) {
+  if ( ( h > 30 || ServoAction == 2 )  && ServoSenal == true) {
+
+    Serial.println("IF 2, > 30, a 180 grados ");
     myservo.write(StatusServo);
-    StatusServo -= 20;
+    StatusServo += 20;
     ServoAction = 2;
 
-    if (StatusServo == 0) {
+    //
+    if (StatusServo >= 180) {
       ServoSenal = false;
       ServoAction = 0;
     }
+
   }
 
   spr.pushSprite(0, 0); //Push to LCD
